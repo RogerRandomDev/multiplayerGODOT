@@ -19,24 +19,22 @@ func create_server(host:bool):
 		
 		
 	multiplayer.set_multiplayer_peer(peer)
-	id=multiplayer.get_unique_id()
-	known_peers.push_back(id)
-	create_player(id)
+	
 		
 var known_peers=[]
 func load_player(id2):
-	rpc_id(id2,StringName("player_join"),known_peers)
+	id=id2
+	known_peers.push_back(id2)
 	for player in known_peers:
-		if player==1:continue
-		rpc_id(player,StringName("player_join"),[id2])
+		rpc_id(id2,StringName("player_join"),player)
+		rpc_id(player,StringName("player_join"),id2)
 	create_player(id2)
 
 
 
 @rpc(any_peer,reliable)
 func player_join(id2):
-	for id in id2:
-		create_player(id2)
+	create_player(id2)
 func create_player(id2):
 	var player=preload("res://player.tscn").instantiate()
 	player.name=str(id2)
@@ -55,23 +53,19 @@ func _on_button_pressed():
 
 
 
-@rpc(any_peer,reliable)
+@rpc(any_peer,unreliable_ordered)
 func update_peers(peer,data):
-	data=data.erase(peer)
 	for child in data:
 		get_node(str(child)).move_to=data[child]
 
 
 func _process(delta):
-	if id!=1:return
+	if !multiplayer.is_server():return
 	var player_list={}
 	for child in get_children():
 		if typeof(str2var(child.name))==typeof(int(1)):
 			player_list[str2var(child.name)]=child.position
 	for peer in player_list:
-		if peer==1:continue
-		
 		if !known_peers.has(peer):continue
-		
-		rpc_id(peer,StringName("update_peers"),player_list)
+		rpc_id(peer,StringName("update_peers"),peer,player_list)
 	
