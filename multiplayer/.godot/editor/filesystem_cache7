@@ -1,8 +1,7 @@
 0b7126e0c6e86d3ec295a72f5aa6e0bd
-::res://::1652222631
-host.tscn::PackedScene::1403076191745582438::1652222595::0::1::::<><>::res://node_2d.gd
+::res://::1652231416
 icon.png::CompressedTexture2D::8027962385467830024::1652222595::1652222632::1::::<><>::
-node_2d.gd::GDScript::-1::1652222595::0::1::::<>Node2D<>::
-node_2d.tscn::PackedScene::764608041683498352::1652222595::0::1::::<><>::res://node_2d.gd
-player.gd::GDScript::-1::1652222595::0::1::::<>Sprite2D<>::
-player.tscn::PackedScene::2626547100710759395::1652222595::0::1::::<><>::uid://dmm2mq6x8fpwi<>res://player.gd
+node_2d.gd::GDScript::-1::1652230183::0::1::::<>Node2D<>::
+node_2d.tscn::PackedScene::764608041683498352::1652230719::0::1::::<><>::res://node_2d.gd
+player.gd::GDScript::-1::1652230706::0::1::::<>CharacterBody2D<>::
+player.tscn::PackedScene::2626547100710759395::1652230752::0::1::::<><>::uid://dmm2mq6x8fpwi<>res://player.gd
