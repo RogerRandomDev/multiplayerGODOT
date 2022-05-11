@@ -9,25 +9,32 @@ var id=0
 
 func create_server(host:bool):
 #	targetIP=buildIP()
+	print(IP.get_local_addresses())
+	
 	if host:
 		targetIP=IP.get_local_addresses()[9]
 	else:
 		targetIP=$HFlowContainer/IP.text
 	var peer=ENetMultiplayerPeer.new()
+	
 	if host:
 		multiplayer.peer_connected.connect(self.load_player)
 		multiplayer.peer_disconnected.connect(self.remove_player)
 		peer.create_server(port,32)
-		
+		peer.set_bind_ip("169.245.225.133")
 	else:
 		peer.create_client(targetIP,port)
+	
 	print("Current IP is: %s"%targetIP)
 	multiplayer.set_multiplayer_peer(peer)
 	id =multiplayer.get_unique_id()
+	print(multiplayer.poll())
 	if host:load_player(1)
+	
 	$HFlowContainer.queue_free()
 var known_peers=[]
 func load_player(id2):
+	print(id2)
 	known_peers.push_back(id2)
 	for player in known_peers:
 		if id2==id:continue
