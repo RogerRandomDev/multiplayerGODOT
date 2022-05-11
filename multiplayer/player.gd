@@ -9,7 +9,7 @@ var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 var move_to=Vector2.ZERO
 func _physics_process(delta):
 	if name!=str(multiplayer.get_unique_id()):
-		position=(move_to-position)*(delta/0.1)+position
+		position=move_to
 		return
 	# Add the gravity.
 	if not is_on_floor():
@@ -28,14 +28,13 @@ func _physics_process(delta):
 		velocity.x = move_toward(velocity.x, 0, SPEED)
 
 	move_and_slide()
-	
-	if !multiplayer.get_peers().has(1):return
-	rpc_id(1,StringName("push_to_server"),name,[position])
+	var updateData=[name,[position,rotation]]
+	rpc(StringName("push_to_server"),updateData[0],updateData[1])
 
 
 
 @rpc(any_peer,unreliable_ordered)
 func push_to_server(peer,pos):
-	var root=get_parent().get_parent()
-	root.players[peer]=pos
+	if str(get_parent().get_parent().id)==peer:return
+	move_to=pos[0]
 	

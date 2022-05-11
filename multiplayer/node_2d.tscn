@@ -25,6 +25,7 @@ text = "JOIN"
 offset_top = 35.0
 offset_right = 67.0
 offset_bottom = 66.0
+placeholder_text = "IP"
 
 [node name="Players" type="Node2D" parent="."]
 
