@@ -1,7 +1,7 @@
 extends Node2D
 
 @export_range(10000,60000) var port=25000
-@export var targetIP = "111.123.643"
+@export var targetIP = "169.254.227.246"
 @export var server:bool=true
 var update_speed=0.05
 var id=0
@@ -10,7 +10,7 @@ var id=0
 func create_server(host:bool):
 #	targetIP=buildIP()
 	if host:
-		targetIP=IP.get_local_addresses()[3]
+		targetIP=IP.get_local_addresses()[9]
 	else:
 		targetIP=$HFlowContainer/IP.text
 	var peer=ENetMultiplayerPeer.new()
@@ -18,11 +18,10 @@ func create_server(host:bool):
 		multiplayer.peer_connected.connect(self.load_player)
 		multiplayer.peer_disconnected.connect(self.remove_player)
 		peer.create_server(port,32)
-		print("Current IP is: %s"%targetIP)
+		
 	else:
 		peer.create_client(targetIP,port)
-		
-		
+	print("Current IP is: %s"%targetIP)
 	multiplayer.set_multiplayer_peer(peer)
 	id =multiplayer.get_unique_id()
 	if host:load_player(1)
