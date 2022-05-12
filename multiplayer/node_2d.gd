@@ -1,76 +1,92 @@
 extends Node2D
+const UDP_BROADCAST_FREQUENCY = 0.5
 
-@export_range(10000,60000) var port=25000
-@export var targetIP = "169.254.227.246"
-@export var server:bool=true
-var update_speed=0.05
-var id=0
+signal player_connected(id)
+signal player_disconnected
+signal update_players_list
 
+var max_players = 4
+var auto_broadcast = true
 
-func create_server(host:bool):
-#	targetIP=buildIP()
-	print(IP.get_local_addresses())
+var server_code : String
+var player_index : int
+
+var broadcasting : bool=true
+var players_connected : Array
+
+var _broadcast_timer : float = 0
+var udp_network=PacketPeerUDP.new()
+var enet_network=ENetMultiplayerPeer.new()
+var server_udp_port=7001
+var server_enet_port=7000
+func setup():
+	_start_server()
 	
-	if host:
-		targetIP=IP.get_local_addresses()[9]
-	else:
-		targetIP=$HFlowContainer/IP.text
-	var peer=ENetMultiplayerPeer.new()
+	server_code = ""
+	for _i in range(4):
+		server_code += char(97 + (randi() % 25))
+
+	players_connected = []
+	set_accept_connections(true)
+	set_process(true)
 	
-	if host:
-		multiplayer.peer_connected.connect(self.load_player)
-		multiplayer.peer_disconnected.connect(self.remove_player)
-		peer.create_server(port,32)
-		peer.set_bind_ip("169.245.225.133")
-	else:
-		peer.create_client(targetIP,port)
+	if (auto_broadcast):
+		start_broadcast()
+
+func start_broadcast():
+	broadcasting = true
+	if not udp_network.is_bound():
+		if udp_network.bind(server_udp_port) != OK:
+			printt("Error bound on port: " + str(server_udp_port))
+		else:
+			printt("bound on port: " + str(server_udp_port))
+		udp_network.set_broadcast_enabled(true)
+
+func stop_broadcast():
+	broadcasting = false
+	udp_network.close()
+
+func _start_server():
+	var err = enet_network.create_server(server_enet_port, max_players)
+	print("Create server status code: ", err)
 	
-	print("Current IP is: %s"%targetIP)
-	multiplayer.set_multiplayer_peer(peer)
-	id =multiplayer.get_unique_id()
-	print(multiplayer.poll())
-	if host:load_player(1)
-	
-	$HFlowContainer.queue_free()
-var known_peers=[]
-func load_player(id2):
-	print(id2)
-	known_peers.push_back(id2)
-	for player in known_peers:
-		if id2==id:continue
-		rpc_id(id2,StringName("player_join"),player)
-		if player==id:continue
-		rpc_id(player,StringName("player_join"),id2)
-	create_player(id2)
-	
+	multiplayer.set_multiplayer_peer(enet_network)
 
+#warning-ignore:unused_argument
+func _process(delta: float) -> void:
+	_broadcast_timer -= delta
+	if broadcasting and _broadcast_timer <= 0:
+		_broadcast_timer = UDP_BROADCAST_FREQUENCY
+		#warning-ignore:return_value_discarded
+		udp_network.set_dest_address("255.255.255.255", server_udp_port)
+		var stg = server_code
+		var pac = stg
+		#warning-ignore:return_value_discarded
+		udp_network.put_var(pac.to_ascii_buffer())
 
+func set_accept_connections(is_accepting : bool):
+	pass
 
-@rpc(any_peer,reliable)
-func player_join(id2):
-	if get_node_or_null("Players/"+str(id2))!=null:return
-	create_player(id2)
-func create_player(id2):
-	var player=preload("res://player.tscn").instantiate()
-	player.name=str(id2)
-	$Players.add_child(player)
+func _player_connected(id):
+	emit_signal("player_connected", id)
+	players_connected.append(id)
+	if players_connected.size() >= max_players - 1:
+		set_accept_connections(false)
+		if (auto_broadcast):
+			stop_broadcast()
+	emit_signal("update_players_list")
 
-func remove_player(id):
-	get_node("Players/"+str(id)).queue_free()
-	known_peers.erase(id)
+#warning-ignore:unused_argument
+func _player_disconnected(id):
+	emit_signal("player_disconnected")
+	if (players_connected.has(id)):
+		players_connected.erase(id)
+		emit_signal("update_players_list")
 
+func _ready() -> void:
+	print("Ready1")
+	setup()
+#	set_process(false)
 
-func _on_button_2_pressed():
-	server=false
-	create_server(false)
-
-
-func _on_button_pressed():
-	server=true
-	create_server(true)
-
-var players={}
-
-
-
-
+func _exit_tree() -> void:
+	udp_network.close()

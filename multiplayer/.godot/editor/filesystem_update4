@@ -1,3 +1,5 @@
+res://client.gd
+res://client.tscn
 res://node_2d.gd
 res://node_2d.tscn
 res://player.tscn
