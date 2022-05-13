@@ -5,7 +5,7 @@ var udp_port=12050
 var targetIP=""
 var udp=PacketPeerUDP.new()
 var peer=ENetMultiplayerPeer.new()
-var is_host="listenFor"
+var is_host="nu"
 
 var reCheck=0.5;
 
@@ -15,7 +15,7 @@ var connected=false
 func _ready():
 	
 	setup()
-
+func nu(delta):pass
 
 func host():
 	var targetIP=IP.get_local_addresses()[7]
@@ -33,12 +33,15 @@ func update_connection():
 	$Map/Label.text="connected"
 
 func connectServer(ip="",pack=""):
+	udp.connect_to_host("255.255.255.255",udp_port)
+	is_host="listenFor"
+	if targetIP=="":return
 	peer.connect("connection_succeeded",update_connection)
 	ip=targetIP
 	var connecting=peer.create_client(ip,port)
 	multiplayer.set_multiplayer_peer(peer)
 	connected=true
-	is_host="asClient"
+	
 
 
 
