@@ -1,3 +1,4 @@
+Label
 CollisionPolygon2D
 Polygon2D
 StaticBody2D
@@ -8,4 +9,3 @@ CharacterBody2D
 LineEdit
 HFlowContainer
 Timer
-Label

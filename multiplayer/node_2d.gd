@@ -26,12 +26,16 @@ func host():
 	peer.connect("peer_connected",print_peer)
 
 
+func update_connection():
+	$Map/Label.text="connected"
+
 func connectServer(ip="",pack=""):
-	print(targetIP)
+	peer.connect("connection_succeeded",update_connection)
 	ip=targetIP
-	peer.create_client(ip,port)
+	var connecting=peer.create_client(ip,port)
 	multiplayer.set_multiplayer_peer(peer)
 	connected=true
+	is_host="asClient"
 
 
 
@@ -51,6 +55,9 @@ func hostServer(delta):
 	reCheck=0.5;
 	udp.set_dest_address('255.255.255.255',udp_port)
 	udp.put_packet(sendPacket)
+
+func asClient(delta):
+	pass
 
 
 func setup() -> void:

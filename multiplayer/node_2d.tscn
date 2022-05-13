@@ -38,5 +38,12 @@ polygon = PackedVector2Array(-30, 428, 544, 426, 585, 567, 852, 491, 928, 309, 1
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Map/StaticBody2D"]
 polygon = PackedVector2Array(-30, 428, 544, 426, 585, 567, 852, 491, 928, 309, 1022, 359, 1027, 608, -22, 619)
 
+[node name="Label" type="Label" parent="Map"]
+offset_left = 129.0
+offset_top = 1.0
+offset_right = 372.0
+offset_bottom = 125.0
+text = "disconnected"
+
 [connection signal="pressed" from="HFlowContainer/Button" to="." method="host"]
 [connection signal="pressed" from="HFlowContainer/Button2" to="." method="connectServer"]
