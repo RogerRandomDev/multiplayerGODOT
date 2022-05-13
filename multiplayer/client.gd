@@ -54,9 +54,11 @@ func _process(delta: float) -> void:
 
 func _connected_ok():
 	emit_signal("connection_ok")
+	print("a")
 
 func _connected_fail():
 	emit_signal("connection_error")
+	print("b")
 
 func _server_disconnected():
 	emit_signal("disconnected")

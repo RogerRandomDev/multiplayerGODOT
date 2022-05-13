@@ -38,5 +38,5 @@ polygon = PackedVector2Array(-30, 428, 544, 426, 585, 567, 852, 491, 928, 309, 1
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Map/StaticBody2D"]
 polygon = PackedVector2Array(-30, 428, 544, 426, 585, 567, 852, 491, 928, 309, 1022, 359, 1027, 608, -22, 619)
 
-[connection signal="pressed" from="HFlowContainer/Button" to="." method="_on_button_pressed"]
-[connection signal="pressed" from="HFlowContainer/Button2" to="." method="_on_button_2_pressed"]
+[connection signal="pressed" from="HFlowContainer/Button" to="." method="host"]
+[connection signal="pressed" from="HFlowContainer/Button2" to="." method="connectServer"]
