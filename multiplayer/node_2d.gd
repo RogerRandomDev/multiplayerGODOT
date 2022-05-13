@@ -2,75 +2,49 @@ extends Node2D
 
 var port=12049
 var udp_port=12050
-var targetIP=""
-var udp=PacketPeerUDP.new()
-var peer=ENetMultiplayerPeer.new()
-var is_host="nu"
-
-var reCheck=0.5;
-
-var sendPacket=""
-
-var connected=false
-func _ready():
-	
-	setup()
-func nu(delta):pass
-
-func host():
-	var targetIP=IP.get_local_addresses()[7]
-	udp.set_broadcast_enabled(true)
-	peer.set_bind_ip(targetIP)
-	peer.create_server(port,16)
-	is_host="hostServer"
-	sendPacket=targetIP.to_ascii_buffer()
-	multiplayer.set_multiplayer_peer(peer)
-	peer.connect("peer_connected",print_peer)
-	
+var udp := PacketPeerUDP.new()
+var connected = false
+var server := UDPServer.new()
+var peers = []
 
 
-func update_connection():
-	$Map/Label.text="connected"
 
-func connectServer(ip="",pack=""):
-	udp.connect_to_host("255.255.255.255",udp_port)
-	is_host="listenFor"
-	if targetIP=="":return
-	peer.connect("connection_succeeded",update_connection)
-	ip=targetIP
-	var connecting=peer.create_client(ip,port)
-	multiplayer.set_multiplayer_peer(peer)
-	connected=true
-	
+func host(delta):
+	server.poll() # Important!
+	if server.is_connection_available():
+		var peer : PacketPeerUDP = server.take_connection()
+		var pkt = peer.get_packet()
+		print("Accepted peer: %s:%s" % [peer.get_packet_ip(), peer.get_packet_port()])
+		print("Received data: %s" % [pkt.get_string_from_utf8()])
+		# Reply so it knows we received the message.
+		peer.put_packet(pkt)
+		# Keep a reference so we can keep contacting the remote peer.
+		peers.append(peer)
+
+	for i in range(0, peers.size()):
+		pass # Do something with the connected peers.
 
 
+func client(delta):
+	if !connected:
+		# Try to contact server
+		udp.put_packet("The answer is... 42!".to_ascii_buffer())
+	if udp.get_available_packet_count() > 0:
+		print("Connected: %s" % udp.get_packet().get_string_from_ascii())
+		connected = true
+
+var cur_load="nulll"
+func nulll(delta):pass
+func _on_button_pressed():
+	server.listen(4242)
+	cur_load="host"
+
+
+func _on_button_2_pressed():
+	cur_load="client"
+	udp.connect_to_host("255.255.255.255", 4242)
 
 
 func _process(delta):
-	call(is_host,delta)
+	call(cur_load,delta)
 
-func listenFor(delta):
-	if udp.get_available_packet_count()>0:
-		
-		var packet=udp.get_packet().get_string_from_ascii()
-		print(packet)
-		targetIP=packet
-	
-func hostServer(delta):
-	reCheck-=delta
-	if reCheck>0.0:return
-	reCheck=0.5;
-	udp.set_dest_address('255.255.255.255',udp_port)
-	
-	udp.put_packet(sendPacket)
-func asClient(delta):
-	pass
-
-
-func setup() -> void:
-	peer.set_target_peer(ENetMultiplayerPeer.TARGET_PEER_SERVER)
-	if udp.bind(udp_port)!=OK:print("failed connection")
-
-
-func print_peer(id):
-	print(id)

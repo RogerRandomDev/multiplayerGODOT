@@ -45,5 +45,5 @@ offset_right = 372.0
 offset_bottom = 125.0
 text = "disconnected"
 
-[connection signal="pressed" from="HFlowContainer/Button" to="." method="host"]
-[connection signal="pressed" from="HFlowContainer/Button2" to="." method="connectServer"]
+[connection signal="pressed" from="HFlowContainer/Button" to="." method="_on_button_pressed"]
+[connection signal="pressed" from="HFlowContainer/Button2" to="." method="_on_button_2_pressed"]
