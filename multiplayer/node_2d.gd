@@ -44,11 +44,13 @@ func _process(delta):
 	call(is_host,delta)
 
 func listenFor(delta):
-	if udp.get_available_packet_count()>0&&!connected:
+	
+	if udp.get_available_packet_count()>0:
 		targetIP=udp.get_packet_ip()
+		print(targetIP)
 		var packet=udp.get_packet().get_string_from_ascii()
 		
-		
+	
 func hostServer(delta):
 	reCheck-=delta
 	if reCheck>0.0:return
@@ -62,8 +64,8 @@ func asClient(delta):
 
 func setup() -> void:
 	peer.set_target_peer(ENetMultiplayerPeer.TARGET_PEER_SERVER)
-	set_process(true)
 	udp.bind(udp_port)
+	
 
 
 func print_peer(id):
